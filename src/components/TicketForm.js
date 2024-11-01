@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const TicketForm = ({ dispatch }) => {
+const TicketForm = ({ dispatch, editingTicket }) => {
   const [title, setTitle] = useState('');
 
   const [description, setDescription] = useState('');
@@ -8,9 +8,9 @@ const TicketForm = ({ dispatch }) => {
   const [priority, setPriority] = useState('1');
 
   const priorityLabels = {
-    1: 'Low',
-    2: 'Medium',
-    3: 'High',
+    '1': 'Low',
+    '2': 'Medium',
+    '3': 'High',
   };
 
   const clearForm = () => {
@@ -18,8 +18,18 @@ const TicketForm = ({ dispatch }) => {
 
     setDescription('');
 
-    setPriority(1);
+    setPriority('1');
   }
+
+  useEffect(() => {
+    if (!editingTicket) return;
+
+    setTitle(editingTicket.title);
+
+    setDescription(editingTicket.description);
+
+    setPriority(editingTicket.priority);
+  }, [editingTicket]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,12 +41,36 @@ const TicketForm = ({ dispatch }) => {
       priority,
     }
 
+    if (!!editingTicket) {
+      dispatch({
+        type: 'UPDATE_TICKET',
+        payload: {
+          title,
+          description,
+          priority,
+          id: editingTicket.id,
+        }
+      });
+
+      clearForm();
+
+      return;
+    }
+
     dispatch({
       type: 'ADD_TICKET',
       payload: ticketData,
     });
 
     clearForm();
+  }
+
+  const handleCancel = () => {
+    clearForm();
+
+    dispatch({
+      type: 'CLEAR_EDITING_TICKET',
+    })
   }
 
   return (
@@ -81,7 +115,12 @@ const TicketForm = ({ dispatch }) => {
         }
       </fieldset>
 
-      <button type='submit' className='butotn'>Submit</button>
+      <button type='submit' className='button'>Submit</button>
+      {
+        editingTicket && (
+          <button type='submit' className='button' onClick={() => handleCancel()}>Cancel Edit</button>
+        )
+      }
     </form>
   )
 }
