@@ -27,6 +27,10 @@ label {
     margin: 0 auto;
 }
 
+.ticket-form > div > input, .ticket-form > div > textarea {
+    width: 100%;
+    margin-bottom: 1rem;
+}
 
 .ticket-list {
     margin-bottom: 200px;
